@@ -12,13 +12,7 @@ const params = {
   Body: fileStream,
 };
 
-s3.putObject(params, (err, data) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log('File uploaded successfully');
-  }
-});
+Response =  s3.upload(params).promise();
 
 }
 exports.s3uploadfun=s3uploadfun;

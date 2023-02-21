@@ -6,6 +6,8 @@ const { s3uploadfun } = require('./s3');
 const server = express();
 const PORT = 3000;
 
+const fs = require('fs');
+
 // uploaded images are saved in the folder "/upload_images"
 const upload = multer({dest: __dirname + '/upload_images'});
 
@@ -18,10 +20,10 @@ server.post('/', upload.single('myfile'), function(request, respond) {
   
   sendFiletoSQS(request.file.originalname,respond);
 
-  // s3uploadfun(request,respond);
+  s3uploadfun(request,respond);
 
   // save the image
-  var fs = require('fs');
+
   fs.rename(__dirname + '/upload_images/' + request.file.filename, __dirname + '/upload_images/' + request.file.originalname, function(err) {
     if ( err ) console.log('ERROR: ' + err);
   });
