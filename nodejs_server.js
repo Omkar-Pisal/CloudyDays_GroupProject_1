@@ -1,6 +1,8 @@
 // we use express and multer libraries to send images
 const express = require('express');
 const multer = require('multer');
+const { sendFiletoSQS } = require('./sqs');
+const { s3uploadfun } = require('./s3');
 const server = express();
 const PORT = 3000;
 
@@ -11,8 +13,13 @@ server.use(express.static('public'));
 
 // "myfile" is the key of the http payload
 server.post('/', upload.single('myfile'), function(request, respond) {
+  
   if(request.file) console.log(request.file);
   
+  sendFiletoSQS(request.file.originalname,respond);
+
+  // s3uploadfun(request,respond);
+
   // save the image
   var fs = require('fs');
   fs.rename(__dirname + '/upload_images/' + request.file.filename, __dirname + '/upload_images/' + request.file.originalname, function(err) {
