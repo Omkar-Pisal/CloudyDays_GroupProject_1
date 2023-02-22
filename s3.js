@@ -3,7 +3,7 @@ const { request, response } = require('express');
 const s3 = new AWS.S3();
 
 const fs = require('fs');
-const s3uploadfun = (request,response) =>{
+const s3uploadfun = (request,respond) =>{
 const fileStream = fs.createReadStream(request.file.path);
 
 const params = {

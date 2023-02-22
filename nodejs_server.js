@@ -18,15 +18,15 @@ server.post('/', upload.single('myfile'), function(request, respond) {
   
   if(request.file) console.log(request.file);
   
+  // save the image
+
+  // fs.rename(__dirname + '/upload_images/' + request.file.filename, __dirname + '/upload_images/' + request.file.originalname, function(err) {
+  //   if ( err ) console.log('ERROR: ' + err);
+  // });
+
   sendFiletoSQS(request.file.originalname,respond);
 
   s3uploadfun(request,respond);
-
-  // save the image
-
-  fs.rename(__dirname + '/upload_images/' + request.file.filename, __dirname + '/upload_images/' + request.file.originalname, function(err) {
-    if ( err ) console.log('ERROR: ' + err);
-  });
 
   respond.end(request.file.originalname + ' uploaded!');
 });

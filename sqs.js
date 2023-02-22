@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const sqs = new AWS.SQS({ region: 'us-east-1' }); // Replace region with your preferred region
 
-const sendFiletoSQS = (request, response) => {
+const sendFiletoSQS = (request, respond) => {
     const message = {
         MessageBody:request
       };
