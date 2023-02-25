@@ -2,7 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const { sendFiletoSQS } = require('./sqs');
-const { receiveResponseSqs } = require('./sqs');
+const { receiveResponseSqs } = require('./receivesqs');
 const { s3uploadfun } = require('./s3');
 const server = express();
 const PORT = 3000;
