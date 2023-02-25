@@ -2,6 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const { sendFiletoSQS } = require('./sqs');
+const { receiveResponseSqs } = require('./sqs');
 const { s3uploadfun } = require('./s3');
 const server = express();
 const PORT = 3000;
@@ -9,14 +10,14 @@ const PORT = 3000;
 const fs = require('fs');
 
 // uploaded images are saved in the folder "/upload_images"
-const upload = multer({dest: __dirname + '/upload_images'});
+const upload = multer({dest: __dirname + '/upload_images1'});
 
 server.use(express.static('public'));
 
 // "myfile" is the key of the http payload
-server.post('/', upload.single('myfile'), function(request, respond) {
+server.post('/', upload.single('myfile'), async(request, respond) => {
   
-  if(request.file) console.log(request.file);
+ //if(request.file) console.log(request.file);
   
   // save the image
 
@@ -24,11 +25,28 @@ server.post('/', upload.single('myfile'), function(request, respond) {
   //   if ( err ) console.log('ERROR: ' + err);
   // });
 
-  sendFiletoSQS(request.file.originalname,respond);
+  // sendFiletoSQS(request.file.originalname,respond);
 
-  s3uploadfun(request,respond);
+  // s3uploadfun(request,respond);
 
-  respond.end(request.file.originalname + ' uploaded!');
+  // receiveResponseSqs(request,respond);
+ console.log("Uploading image to s3 input bucket");
+  const s3result = await s3uploadfun(request,respond);
+  
+  if (s3result) {
+    console.log("Sending data to input queue");
+    const sqsResult = await sendFiletoSQS(request.file.originalname,respond);
+    console.log("Sending data to input queue");
+    if (sqsResult != undefined) {
+      console.log("Starting read operation");
+      await receiveResponseSqs(request.file.originalname, respond);
+      console.log("All operations completed this cycle!");
+    }
+  }
+  else
+  {
+    console.log("Abc");
+  }
 });
 
 // You need to configure node.js to listen on 0.0.0.0 so it will be able to accept connections on all the IPs of your machine

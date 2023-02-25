@@ -12,7 +12,7 @@ const params = {
   Body: fileStream,
 };
 
-Response =  s3.upload(params).promise();
+return s3.upload(params).promise();
 
 }
 exports.s3uploadfun=s3uploadfun;
