@@ -22,34 +22,37 @@ response = sqs.receive_message(
 )
 
 #print(response)
-message = response['Messages'][0]
-receipt_handle = message['ReceiptHandle']
+if 'Messages' in response:
+    message = response['Messages'][0]
+    receipt_handle = message['ReceiptHandle']
 
-filename = message['Body']
-#print(filename)
+    filename = message['Body']
+    #print(filename)
+    #print('Received message: %s' % filename)
 
-#print('Received message: %s' % filename)
+    s3.download_file('cloudydays-project1-s3bucket-input', filename, "downloaded_images/"+filename)
+    inpara = "downloaded_images/"+filename
+    classification = subprocess.run(['python3','image_classification.py',inpara],capture_output=True)
 
-s3.download_file('cloudydays-project1-s3bucket-input', filename, "downloaded_images/"+filename)
+    classification_str = classification.stdout.decode('utf-8')
 
-inpara = "downloaded_images/"+filename
-classification = subprocess.run(['python3','image_classification.py',inpara],capture_output=True)
-
-classification_str = classification.stdout.decode('utf-8')
-
-# Send message to SQS queue
-sqs.send_message(
+    # Send message to SQS queue
+    sqs.send_message(
     QueueUrl=queue_url_output,
     MessageBody=classification_str)
 
-message_body = filename+","+classification_str
+    message_body = filename+","+classification_str
 
-#Upload object to s3
-s3.put_object(Bucket="cloudydays-project1-s3bucket-output", Body=message_body, Key=filename)
+    new_filename = filename.replace(".JPEG",".txt")
 
-print("All Done!")
-# Delete received message from queue
-sqs.delete_message(
-    QueueUrl=queue_url,
-    ReceiptHandle=receipt_handle
+    #Upload object to s3
+    s3.put_object(Bucket="cloudydays-project1-s3bucket-output", Body=message_body, Key=new_filename)
+
+    print("All Done!")
+    # Delete received message from queue
+    sqs.delete_message(
+        QueueUrl=queue_url,
+        ReceiptHandle=receipt_handle
 )
+else:
+    print("No Messages found in queue")
