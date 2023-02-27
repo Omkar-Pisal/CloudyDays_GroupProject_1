@@ -26,9 +26,7 @@ url = args.url
 image_folder = args.image_folder
 # Iterate through all the images in your local folder
 for i, name in enumerate(os.listdir(image_folder)):
-    print(i)
     if i == num_request:
         break
     image_path = image_folder + name
-    print(image_path)
     send_one_request(url, image_path)

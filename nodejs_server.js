@@ -30,22 +30,19 @@ server.post('/', upload.single('myfile'), async(request, respond) => {
   // s3uploadfun(request,respond);
 
   // receiveResponseSqs(request,respond);
- console.log("Uploading image to s3 input bucket");
+
   const s3result = await s3uploadfun(request,respond);
   
   if (s3result) {
-    console.log("Sending data to input queue");
     const sqsResult = await sendFiletoSQS(request.file.originalname,respond);
-    console.log("Sending data to input queue");
     if (sqsResult != undefined) {
-      console.log("Starting read operation");
       await receiveResponseSqs(request.file.originalname, respond);
-      console.log("All operations completed this cycle!");
+
     }
   }
   else
   {
-    console.log("Abc");
+    console.log("Error");
   }
 });
 
@@ -54,4 +51,3 @@ const hostname = '0.0.0.0';
 server.listen(PORT, hostname, () => {
     console.log(`Server running at http://${hostname}:${PORT}/`);
   });
-  
