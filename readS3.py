@@ -14,7 +14,7 @@ queue_url_output = 'https://sqs.us-east-1.amazonaws.com/486647676456/cloudydays-
 # Receive message from SQS queue
 response = sqs.receive_message(
     QueueUrl=queue_url,
-    MaxNumberOfMessages=1,
+    MaxNumberOfMessages=3,
     MessageAttributeNames=[
         'All'
     ],
