@@ -41,8 +41,7 @@ image_path_list = []
 for i, name in enumerate(os.listdir(image_folder)):
     if i == num_request:
         break
-    if(image_folder is not None):
-        image_path_list= image_folder + name
+    image_path_list.append(image_folder + name)
 
 
 with ThreadPoolExecutor(max_workers = num_max_workers) as executor:
